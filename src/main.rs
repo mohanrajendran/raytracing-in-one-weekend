@@ -1,7 +1,11 @@
 extern crate image;
 
+mod vec3;
+
 use std::fs::File;
 use std::path::Path;
+
+use vec3::Vec3;
 
 fn main() {
     let width = 200;
@@ -14,12 +18,10 @@ fn main() {
         let y = (height - y) as f32;
         let w = width as f32;
         let h = height as f32;
-        let r = (255.9 * x / w) as u8;
-        let g = (255.9 * y / h) as u8;
-        let b = (255.9 * 0.2) as u8;
-        *pixel = image::Rgb([r, g, b]);
+        let color = Vec3::new(x/w, y/h, 0.2);
+        *pixel = image::Rgb(color.rgb());
     }
 
     let ref mut fout = File::create(&Path::new("image.png")).unwrap();
-    image::ImageRgb8(image_buf).save(fout, image::PNG);
+    let _ = image::ImageRgb8(image_buf).save(fout, image::PNG);
 }
