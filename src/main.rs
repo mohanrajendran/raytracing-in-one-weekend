@@ -9,10 +9,22 @@ use std::path::Path;
 use ray::Ray;
 use vec3::Vec3;
 
-fn color(ray: &Ray) -> Vec3 {
-    let dir = ray.direction().normal();
-    let t = 0.5*(dir.y() + 1.0);
-    Vec3::new(1.0, 1.0, 1.0) * (1.0-t) + Vec3::new(0.5, 0.7, 1.0) * t
+fn hit_sphere(center: Vec3, radius: f32, ray: Ray) -> bool {
+    let oc = ray.origin() - center;
+    let a = ray.direction().dot(ray.direction());
+    let b = 2.0 * oc.dot(ray.direction());
+    let c = oc.dot(oc) - radius * radius;
+    b * b - 4.0 * a * c > 0.0
+}
+
+fn color(ray: Ray) -> Vec3 {
+    if hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, ray) {
+        Vec3::new(1.0, 0.0, 0.0)
+    } else {
+        let dir = ray.direction().normal();
+        let t = 0.5 * (dir.y() + 1.0);
+        Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t
+    }
 }
 
 fn main() {
@@ -30,10 +42,10 @@ fn main() {
         let y = (height - y) as f32;
         let w = width as f32;
         let h = height as f32;
-        let u = x/w;
-        let v = y/h;
-        let r = Ray::new(origin, lower_left_corner + horizontal*u + vertical*v);
-        let col = color(&r);
+        let u = x / w;
+        let v = y / h;
+        let r = Ray::new(origin, lower_left_corner + horizontal * u + vertical * v);
+        let col = color(r);
         *pixel = image::Rgb(col.rgb());
     }
 
