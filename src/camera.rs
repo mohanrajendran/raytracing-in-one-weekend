@@ -1,5 +1,4 @@
-use ray::Ray;
-use vec3::Vec3;
+use vec3::{Ray, Vec3};
 
 pub struct Camera {
     pub origin: Vec3,

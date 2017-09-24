@@ -3,8 +3,6 @@ extern crate rand;
 
 mod camera;
 mod geometry;
-mod ray;
-mod sphere;
 mod vec3;
 
 use std::f32;
@@ -12,10 +10,8 @@ use std::fs::File;
 use std::path::Path;
 
 use camera::Camera;
-use geometry::{Hit, Hitable};
-use ray::Ray;
-use sphere::Sphere;
-use vec3::Vec3;
+use geometry::{Hit, Hitable, Sphere};
+use vec3::{Ray, Vec3};
 
 fn random_in_unit_sphere() -> Vec3 {
     let mut p = Vec3::new(0.0, 0.0, 0.0);
@@ -33,7 +29,7 @@ fn random_in_unit_sphere() -> Vec3 {
 }
 
 fn color(ray: Ray, world: &Hitable) -> Vec3 {
-    match world.hit(ray, 0.0, f32::MAX) {
+    match world.hit(ray, 0.0001, f32::MAX) {
         Some(hit) => {
             let target = hit.normal + random_in_unit_sphere();
             color(Ray::new(hit.p, target), world) * 0.5
