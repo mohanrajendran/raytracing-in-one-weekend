@@ -28,7 +28,7 @@ impl Vec3 {
     }
 
     pub fn length(&self) -> f32 {
-        (self.0 * self.0 + self.1 * self.1 + self.2 * self.2).sqrt()
+        self.dot(*self).sqrt()
     }
 
     pub fn normal(&self) -> Vec3 {
@@ -60,7 +60,7 @@ impl Sub for Vec3 {
     type Output = Vec3;
 
     fn sub(self, other: Vec3) -> Vec3 {
-        Vec3::new(self.0 + other.0, self.1 + other.1, self.2 + other.2)
+        Vec3::new(self.0 - other.0, self.1 - other.1, self.2 - other.2)
     }
 }
 
