@@ -1,5 +1,5 @@
 use std::f32;
-use std::ops::{Add, Sub, Mul};
+use std::ops::{Add, Sub, Mul, Div};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3(f32, f32, f32);
@@ -36,7 +36,7 @@ impl Vec3 {
         if len == 0.0 {
             Vec3::new(0.0,0.0,0.0)
         } else {
-            *self * (1.0 / len)
+            *self / len
         }
     }
 
@@ -69,5 +69,13 @@ impl Mul<f32> for Vec3 {
 
     fn mul(self, m: f32) -> Vec3 {
         Vec3::new(self.0 * m, self.1 * m, self.2 * m)
+    }
+}
+
+impl Div<f32> for Vec3 {
+    type Output = Vec3;
+
+    fn div(self, m: f32) -> Vec3 {
+        self * (1.0 / m)
     }
 }

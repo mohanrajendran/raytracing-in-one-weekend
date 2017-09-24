@@ -29,7 +29,7 @@ impl Hitable for Sphere {
             if temp1 < t_max && temp1 > t_min {
                 let t = temp1;
                 let p = ray.point_at_parameter(t);
-                let n = (p - self.center) * (1.0 / self.radius);
+                let n = (p - self.center).normal();
                 let h = Hit {
                     t: t,
                     p: p,
@@ -39,7 +39,7 @@ impl Hitable for Sphere {
             } else if temp2 < t_max && temp2 > t_min {
                 let t = temp2;
                 let p = ray.point_at_parameter(t);
-                let n = (p - self.center) * (1.0 / self.radius);
+                let n = (p - self.center).normal();
                 let h = Hit {
                     t: t,
                     p: p,
