@@ -17,14 +17,26 @@ use ray::Ray;
 use sphere::Sphere;
 use vec3::Vec3;
 
+fn random_in_unit_sphere() -> Vec3 {
+    let mut p = Vec3::new(0.0, 0.0, 0.0);
+    loop {
+        p = Vec3::new(
+            rand::random::<f32>(),
+            rand::random::<f32>(),
+            rand::random::<f32>(),
+        ) * 2.0 - Vec3::new(1.0, 1.0, 1.0);
+        if p.dot(p) < 1.0 {
+            break;
+        }
+    }
+    p
+}
+
 fn color(ray: Ray, world: &Hitable) -> Vec3 {
     match world.hit(ray, 0.0, f32::MAX) {
         Some(hit) => {
-            Vec3::new(
-                hit.normal.x() + 1.0,
-                hit.normal.y() + 1.0,
-                hit.normal.z() + 1.0,
-            ) * 0.5
+            let target = hit.normal + random_in_unit_sphere();
+            color(Ray::new(hit.p, target), world) * 0.5
         }
         None => {
             let dir = ray.direction().normal();
@@ -35,9 +47,9 @@ fn color(ray: Ray, world: &Hitable) -> Vec3 {
 }
 
 fn main() {
-    let width = 400;
-    let height = 200;
-    let samples = 100;
+    let width = 500;
+    let height = 250;
+    let samples = 10;
 
     let mut world: Vec<Box<Hitable>> = Vec::new();
     world.push(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)));
@@ -58,7 +70,8 @@ fn main() {
             let r = camera.get_ray(u, v);
             col = col + color(r, &world);
         }
-        col = col / (samples as  f32);
+        col = col / (samples as f32);
+        col = Vec3::new(col.x().sqrt(), col.y().sqrt(), col.z().sqrt());
         *pixel = image::Rgb(col.rgb());
     }
 
