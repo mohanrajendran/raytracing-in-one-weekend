@@ -3,6 +3,7 @@ extern crate rand;
 
 mod camera;
 mod geometry;
+mod material;
 mod vec3;
 
 use std::f32;
@@ -10,29 +11,23 @@ use std::fs::File;
 use std::path::Path;
 
 use camera::Camera;
-use geometry::{Hit, Hitable, Sphere};
+use geometry::{Hitable, Sphere};
+use material::{Lambertian, Metal};
 use vec3::{Ray, Vec3};
 
-fn random_in_unit_sphere() -> Vec3 {
-    let mut p = Vec3::new(0.0, 0.0, 0.0);
-    loop {
-        p = Vec3::new(
-            rand::random::<f32>(),
-            rand::random::<f32>(),
-            rand::random::<f32>(),
-        ) * 2.0 - Vec3::new(1.0, 1.0, 1.0);
-        if p.dot(p) < 1.0 {
-            break;
-        }
-    }
-    p
-}
-
-fn color(ray: Ray, world: &Hitable) -> Vec3 {
+fn color(ray: Ray, world: &Hitable, depth: u8) -> Vec3 {
     match world.hit(ray, 0.0001, f32::MAX) {
         Some(hit) => {
-            let target = hit.normal + random_in_unit_sphere();
-            color(Ray::new(hit.p, target), world) * 0.5
+            match hit.material.scatter(ray, hit) {
+                Some(scatter) => {
+                    if depth < 50 {
+                        scatter.attenuation * color(scatter.scattered, world, depth + 1)
+                    } else {
+                        Vec3::new(0.0, 0.0, 0.0)
+                    }
+                }
+                None => Vec3::new(0.0, 0.0, 0.0),
+            }
         }
         None => {
             let dir = ray.direction().normal();
@@ -45,11 +40,29 @@ fn color(ray: Ray, world: &Hitable) -> Vec3 {
 fn main() {
     let width = 500;
     let height = 250;
-    let samples = 10;
+    let samples = 100;
 
     let mut world: Vec<Box<Hitable>> = Vec::new();
-    world.push(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)));
-    world.push(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
+    world.push(Box::new(Sphere::new(
+        Vec3::new(0.0, 0.0, -1.0),
+        0.5,
+        Box::new(Lambertian::new(Vec3::new(0.8, 0.3, 0.3))),
+    )));
+    world.push(Box::new(Sphere::new(
+        Vec3::new(0.0, -100.5, -1.0),
+        100.0,
+        Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0))),
+    )));
+    world.push(Box::new(Sphere::new(
+        Vec3::new(1.0, 0.0, -1.0),
+        0.5,
+        Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 1.0)),
+    )));
+    world.push(Box::new(Sphere::new(
+        Vec3::new(-1.0, 0.0, -1.0),
+        0.5,
+        Box::new(Metal::new(Vec3::new(0.8, 0.8, 0.8), 0.3)),
+    )));
 
     let mut image_buf = image::ImageBuffer::new(width, height);
     let camera = Camera::new();
@@ -64,7 +77,7 @@ fn main() {
             let u = (x + rand::random::<f32>()) / w;
             let v = (y + rand::random::<f32>()) / h;
             let r = camera.get_ray(u, v);
-            col = col + color(r, &world);
+            col = col + color(r, &world, 0);
         }
         col = col / (samples as f32);
         col = Vec3::new(col.x().sqrt(), col.y().sqrt(), col.z().sqrt());

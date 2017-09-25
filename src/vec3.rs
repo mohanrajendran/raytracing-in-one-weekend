@@ -1,7 +1,7 @@
 use std::f32;
 use std::ops::{Add, Sub, Mul, Div};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct Vec3(f32, f32, f32);
 
 impl Vec3 {
@@ -34,7 +34,7 @@ impl Vec3 {
     pub fn normal(&self) -> Vec3 {
         let len = self.length();
         if len == 0.0 {
-            Vec3::new(0.0,0.0,0.0)
+            Vec3::new(0.0, 0.0, 0.0)
         } else {
             *self / len
         }
@@ -64,6 +64,14 @@ impl Sub for Vec3 {
     }
 }
 
+impl Mul for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, other: Vec3) -> Vec3 {
+        Vec3::new(self.0 * other.0, self.1 * other.1, self.2 * other.2)
+    }
+}
+
 impl Mul<f32> for Vec3 {
     type Output = Vec3;
 
@@ -80,7 +88,7 @@ impl Div<f32> for Vec3 {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct Ray {
     o: Vec3,
     d: Vec3,

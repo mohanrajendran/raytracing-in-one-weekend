@@ -1,10 +1,12 @@
+use material::Material;
 use vec3::{Vec3, Ray};
 
-#[derive(Debug, Clone, Copy)]
-pub struct Hit {
+#[derive(Clone, Copy)]
+pub struct Hit<'a> {
     pub t: f32,
     pub p: Vec3,
     pub normal: Vec3,
+    pub material: &'a Material,
 }
 
 pub trait Hitable {
@@ -21,7 +23,7 @@ impl Hitable for Vec<Box<Hitable>> {
                         if hit.t < best.t {
                             temp_rec = Some(hit)
                         }
-                    },
+                    }
                     None => temp_rec = Some(hit),
                 }
             }
@@ -33,13 +35,15 @@ impl Hitable for Vec<Box<Hitable>> {
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f32,
+    pub material: Box<Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f32) -> Self {
+    pub fn new(center: Vec3, radius: f32, material: Box<Material>) -> Self {
         Sphere {
             center: center,
             radius: radius,
+            material: material,
         }
     }
 }
@@ -62,6 +66,7 @@ impl Hitable for Sphere {
                     t: t,
                     p: p,
                     normal: n,
+                    material: &*self.material,
                 };
                 Some(h)
             } else if temp2 < t_max && temp2 > t_min {
@@ -72,6 +77,7 @@ impl Hitable for Sphere {
                     t: t,
                     p: p,
                     normal: n,
+                    material: &*self.material,
                 };
                 Some(h)
             } else {
