@@ -1,7 +1,7 @@
 use std::f32;
 use std::ops::{Add, Sub, Mul, Div, Neg};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Vec3(f32, f32, f32);
 
 impl Vec3 {
@@ -27,11 +27,19 @@ impl Vec3 {
         self.0 * other.0 + self.1 * other.1 + self.2 * other.2
     }
 
+    pub fn cross(&self, other: Vec3) -> Vec3 {
+        Vec3::new(
+            self.1 * other.2 - self.2 * other.1,
+            self.2 * other.0 - self.0 * other.2,
+            self.0 * other.1 - self.1 * other.0,
+        )
+    }
+
     pub fn length(&self) -> f32 {
         self.dot(*self).sqrt()
     }
 
-    pub fn normal(&self) -> Vec3 {
+    pub fn unit(&self) -> Vec3 {
         let len = self.length();
         if len == 0.0 {
             Vec3::new(0.0, 0.0, 0.0)

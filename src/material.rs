@@ -32,7 +32,7 @@ fn reflect(v: Vec3, n: Vec3) -> Vec3 {
 }
 
 fn refract(v: Vec3, n: Vec3, ni_over_nt: f32) -> Option<Vec3> {
-    let uv = v.normal();
+    let uv = v.unit();
     let dt = uv.dot(n);
     let discriminant = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
     if discriminant > 0.0 {
@@ -88,7 +88,7 @@ impl Metal {
 
 impl Material for Metal {
     fn scatter(&self, ray: Ray, hit_record: Hit) -> Option<Scatter> {
-        let reflected = reflect(ray.direction().normal(), hit_record.normal);
+        let reflected = reflect(ray.direction().unit(), hit_record.normal);
         let scattered = Ray::new(
             hit_record.p,
             reflected + random_in_unit_sphere() * self.fuzz,
@@ -119,11 +119,20 @@ impl Material for Dielectric {
     fn scatter(&self, ray: Ray, hit_record: Hit) -> Option<Scatter> {
         let attenuation = Vec3::new(1.0, 1.0, 1.0);
         let reflected = reflect(ray.direction(), hit_record.normal);
-        let (outward_normal, ni_over_nt, cosine) = if ray.direction().dot(hit_record.normal) > 0.0 {
-            (-hit_record.normal, self.ri, self.ri * ray.direction().dot(hit_record.normal) / ray.direction().length())
-        } else {
-            (hit_record.normal, 1.0/self.ri, -ray.direction().dot(hit_record.normal) / ray.direction().length())
-        };
+        let (outward_normal, ni_over_nt, cosine) =
+            if ray.direction().dot(hit_record.normal) > 0.0 {
+                (
+                    -hit_record.normal,
+                    self.ri,
+                    self.ri * ray.direction().dot(hit_record.normal) / ray.direction().length(),
+                )
+            } else {
+                (
+                    hit_record.normal,
+                    1.0 / self.ri,
+                    -ray.direction().dot(hit_record.normal) / ray.direction().length(),
+                )
+            }; 
         match refract(ray.direction(), outward_normal, ni_over_nt) {
             Some(refracted) => {
                 let reflect_prob = schlick(cosine, self.ri);

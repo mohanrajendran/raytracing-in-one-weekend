@@ -30,7 +30,7 @@ fn color(ray: Ray, world: &Hitable, depth: u8) -> Vec3 {
             }
         }
         None => {
-            let dir = ray.direction().normal();
+            let dir = ray.direction().unit();
             let t = 0.5 * (dir.y() + 1.0);
             Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t
         }
@@ -65,7 +65,13 @@ fn main() {
     )));
 
     let mut image_buf = image::ImageBuffer::new(width, height);
-    let camera = Camera::new();
+    let camera = Camera::new(
+        Vec3::new(-2.0, 2.0, 1.0),
+        Vec3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        45.0,
+        2.0,
+    );
 
     for (x, y, pixel) in image_buf.enumerate_pixels_mut() {
         let x = x as f32;
