@@ -1,5 +1,5 @@
 use std::f32;
-use std::ops::{Add, Sub, Mul, Div};
+use std::ops::{Add, Sub, Mul, Div, Neg};
 
 #[derive(Clone, Copy)]
 pub struct Vec3(f32, f32, f32);
@@ -85,6 +85,14 @@ impl Div<f32> for Vec3 {
 
     fn div(self, m: f32) -> Vec3 {
         self * (1.0 / m)
+    }
+}
+
+impl Neg for Vec3 {
+    type Output = Vec3;
+
+    fn neg(self) -> Vec3 {
+        Vec3::new(-self.0, -self.1, -self.2)
     }
 }
 

@@ -12,7 +12,7 @@ use std::path::Path;
 
 use camera::Camera;
 use geometry::{Hitable, Sphere};
-use material::{Lambertian, Metal};
+use material::{Lambertian, Metal, Dielectric};
 use vec3::{Ray, Vec3};
 
 fn color(ray: Ray, world: &Hitable, depth: u8) -> Vec3 {
@@ -56,12 +56,12 @@ fn main() {
     world.push(Box::new(Sphere::new(
         Vec3::new(1.0, 0.0, -1.0),
         0.5,
-        Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 1.0)),
+        Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.3)),
     )));
     world.push(Box::new(Sphere::new(
         Vec3::new(-1.0, 0.0, -1.0),
         0.5,
-        Box::new(Metal::new(Vec3::new(0.8, 0.8, 0.8), 0.3)),
+        Box::new(Dielectric::new(1.5)),
     )));
 
     let mut image_buf = image::ImageBuffer::new(width, height);
