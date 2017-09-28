@@ -65,12 +65,16 @@ fn main() {
     )));
 
     let mut image_buf = image::ImageBuffer::new(width, height);
+    let lookfrom = Vec3::new(-2.0, 2.0, 1.0);
+    let lookat = Vec3::new(0.0, 0.0, -1.0);
     let camera = Camera::new(
-        Vec3::new(-2.0, 2.0, 1.0),
-        Vec3::new(0.0, 0.0, -1.0),
+        lookfrom,
+        lookat,
         Vec3::new(0.0, 1.0, 0.0),
         45.0,
         2.0,
+        2.0,
+        (lookfrom - lookat).length(),
     );
 
     for (x, y, pixel) in image_buf.enumerate_pixels_mut() {
