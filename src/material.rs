@@ -136,7 +136,7 @@ impl Material for Dielectric {
         match refract(ray.direction(), outward_normal, ni_over_nt) {
             Some(refracted) => {
                 let reflect_prob = schlick(cosine, self.ri);
-                let scattered = if (rand::random::<f32>() < reflect_prob) {
+                let scattered = if rand::random::<f32>() < reflect_prob {
                     Ray::new(hit_record.p, reflected)
                 } else {
                     Ray::new(hit_record.p, refracted)
