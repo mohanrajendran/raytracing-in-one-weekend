@@ -109,9 +109,9 @@ fn random_scene() -> Vec<Box<Hitable>> {
 }
 
 fn main() {
-    let width = 640;
-    let height = 360;
-    let samples = 250;
+    let width = 1280;
+    let height = 720;
+    let samples = 500;
 
     let world = random_scene();
 
@@ -130,6 +130,9 @@ fn main() {
         dist_to_focus,
     );
 
+    let total = width * height;
+    let mut current = 0;
+
     for (x, y, pixel) in image_buf.enumerate_pixels_mut() {
         let x = x as f32;
         let y = (height - y) as f32;
@@ -145,6 +148,8 @@ fn main() {
         col = col / (samples as f32);
         col = Vec3::new(col.x().sqrt(), col.y().sqrt(), col.z().sqrt());
         *pixel = image::Rgb(col.rgb());
+	current = current + 1;
+	println!("{} / {}", current, total);
     }
 
     let ref mut fout = File::create(&Path::new("image.png")).unwrap();
